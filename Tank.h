@@ -1,5 +1,5 @@
 /*
-  TankDrive.h - Library for draving tank RC models.
+  TankDrive.h - Library for driving tank RC models.
   Created by Hrastovc, March 4, 2016.
 */
 #ifndef Tank_h

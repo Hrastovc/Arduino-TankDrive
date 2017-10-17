@@ -1,5 +1,5 @@
 /*
-  TankDrive - Library for draving tank RC models.
+  TankDrive - Library for driving tank RC models.
   Created by Hrastovc, March 4, 2016.
 */
 #include "Arduino.h"
