@@ -47,7 +47,6 @@ void setup(){
 }
 
 void loop(){
-  tank.getValues();       //reads PWM RC signal from specified pins
   if(tank.Signal(8)){     //gets signal info
     tank.Drive();         //analyses x and y joystick coordinators and generates PWM outputs
   }

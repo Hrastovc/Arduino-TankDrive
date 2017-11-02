@@ -28,10 +28,19 @@ Tank::Tank(byte _chPIN_1, byte _chPIN_2, byte _left_motor_forward, byte _left_mo
 }
 
 void Tank::Drive(){
-  if(ch[1]==0 || ch[2]==0) {
-    Motors (0, 0, 0, 0);
+  if(ch[1] == 0 || ch[2] == 0){
+    signal_info = 0;
+    PWMch[1] = 0;
+    PWMch[2] = 0;
+	Motors (0, 0, 0, 0);
   }else{
-    if(PWMch[1]>-eps && PWMch[1]<eps && PWMch[2]>-eps && PWMch[2]<eps)
+    signal_info = 1;
+	PWMabs[1] = abs(PWMch[1]);
+	PWMabs[2] = abs(PWMch[2]);
+	backward_A = constrain(((PWMabs[1]-PWMabs[2]-133) *2), 0, 255);
+	backward_B = constrain(((PWMabs[1]-PWMabs[2]) *2), 0, 255);
+	
+	if(PWMch[1]>-eps && PWMch[1]<eps && PWMch[2]>-eps && PWMch[2]<eps)
       Motors(0, 0, 0, 0);
       
     if(PWMch[1]<eps && PWMch[1]>-eps && PWMch[2]>eps)
@@ -93,24 +102,14 @@ void Tank::Drive(){
 void Tank::getValues(){
   ch[1] = pulseIn(chPIN[1], HIGH);
   ch[2] = pulseIn(chPIN[2], HIGH);
-  if(ch[1] == 0 || ch[2] == 0){
-    signal_info = 0;
-    PWMch[1] = 0;
-    PWMch[2] = 0;
-  }else{
-    signal_info = 1;
-    PWMch[1] = constrain(map(ch[1], chPulse_min[1], chPulse_max[1], -255, 255), -255, 255);
-    PWMch[2] = constrain(map(ch[2], chPulse_min[2], chPulse_max[2], -255, 255), -255, 255);
-    PWMabs[1] = abs(PWMch[1]);
-    PWMabs[2] = abs(PWMch[2]);
-    backward_A = constrain(((PWMabs[1]-PWMabs[2]-133) *2), 0, 255);
-    backward_B = constrain(((PWMabs[1]-PWMabs[2]) *2), 0, 255);
-  }
+  PWMch[1] = constrain(map(ch[1], chPulse_min[1], chPulse_max[1], -255, 255), -255, 255);
+  PWMch[2] = constrain(map(ch[2], chPulse_min[2], chPulse_max[2], -255, 255), -255, 255);
 }
 
 void Tank::setValues(byte i, int val){
   i = constrain(i, 1, 2);
   PWMch[i] = constrain(val, -255, 255);
+  ch[i] = 1500;
 }
 
 void Tank::Motors (byte val_left_motor_forward, byte val_left_motor_backward, byte val_right_motor_forward, byte val_right_motor_backward) {
@@ -122,7 +121,8 @@ void Tank::Motors (byte val_left_motor_forward, byte val_left_motor_backward, by
 
 boolean Tank::Signal (byte contactor) {
   pinMode(contactor, OUTPUT);
-  if(signal_info == 0){
+  getValues();
+  if(ch[1] == 0 || ch[2] == 0){
     digitalWrite(contactor, LOW);
     return 0;
   }else{
